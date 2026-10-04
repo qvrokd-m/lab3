@@ -1,0 +1,249 @@
+﻿<Window x:Class="Lab3.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Лабораторна робота №3 — Інтерполяція"
+        Width="1250"
+        Height="900"
+        MinWidth="1050"
+        MinHeight="750">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Window.Resources>
+
+    <Grid Margin="15">
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="270"/>
+            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0"
+                Padding="15"
+                CornerRadius="10"
+                BorderBrush="LightGray"
+                BorderThickness="1">
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+                <StackPanel>
+
+                    <TextBlock Text="ІНТЕРПОЛЯЦІЯ"
+                               FontSize="25"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Тестова функція:"
+                               FontWeight="Bold"/>
+
+                    <TextBlock Text="f(x) = sin(x)"
+                               FontSize="18"
+                               Margin="0,5,0,20"/>
+
+                    <TextBlock Text="Крок h₁:"
+                               FontWeight="SemiBold"/>
+
+                    <TextBox Text="{Binding H1Text, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,5,0,0"
+                             Padding="5"/>
+
+                    <TextBlock Text="{Binding H1Error}"
+                               Foreground="Red"
+                               TextWrapping="Wrap"
+                               Margin="0,3,0,10"/>
+
+                    <TextBlock Text="Крок h₂:"
+                               FontWeight="SemiBold"/>
+
+                    <TextBox Text="{Binding H2Text, UpdateSourceTrigger=PropertyChanged}"
+                             Margin="0,5,0,0"
+                             Padding="5"/>
+
+                    <TextBlock Text="{Binding H2Error}"
+                               Foreground="Red"
+                               TextWrapping="Wrap"
+                               Margin="0,3,0,15"/>
+
+                    <Button Content="Побудувати"
+                            Command="{Binding BuildCommand}"
+                            FontSize="16"
+                            Padding="10"
+                            Margin="0,0,0,10"/>
+
+                    <Button Content="Перевірити алгоритми"
+                            Command="{Binding CheckCommand}"
+                            FontSize="16"
+                            Padding="10"
+                            Margin="0,0,0,20"/>
+
+                    <TextBlock Text="Відображення:"
+                               FontWeight="Bold"
+                               Margin="0,0,0,10"/>
+
+                    <CheckBox Content="Еталонна функція"
+                              IsChecked="{Binding ShowReference}"
+                              Margin="0,5"/>
+
+                    <CheckBox Content="Опорні точки"
+                              IsChecked="{Binding ShowSupport}"
+                              Margin="0,5"/>
+
+                    <CheckBox Content="Лінійна інтерполяція"
+                              IsChecked="{Binding ShowLinear}"
+                              Margin="0,5"/>
+
+                    <CheckBox Content="Інтерполяція Ерміта"
+                              IsChecked="{Binding ShowHermite}"
+                              Margin="0,5"/>
+
+                    <CheckBox Content="Графік похибки"
+                              IsChecked="{Binding ShowError}"
+                              Margin="0,5,0,20"/>
+
+                    <TextBlock Text="Умова:"
+                               FontWeight="Bold"/>
+
+                    <TextBlock Text="h₂ &lt; h₁"
+           FontSize="16"
+           Margin="0,5,0,15"/>
+
+                    <TextBlock Text="{Binding Status}"
+                               TextWrapping="Wrap"
+                               FontWeight="SemiBold"/>
+
+                </StackPanel>
+
+            </ScrollViewer>
+
+        </Border>
+
+        <ScrollViewer Grid.Column="2"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto">
+
+            <StackPanel>
+
+                <TextBlock Text="Основний графік"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Margin="0,0,0,10"/>
+
+                <Border BorderBrush="Gray"
+                        BorderThickness="1"
+                        Width="800"
+                        Height="420">
+
+                    <Canvas Width="800"
+                            Height="420"
+                            Background="White">
+
+                        <Polyline Points="{Binding ReferencePoints}"
+                                  Stroke="Black"
+                                  StrokeThickness="2"
+                                  Visibility="{Binding ShowReference, Converter={StaticResource BoolToVisibility}}"/>
+
+                        <Polyline Points="{Binding SupportPoints}"
+                                  Stroke="Gray"
+                                  StrokeThickness="2"
+                                  StrokeDashArray="5,4"
+                                  Visibility="{Binding ShowSupport, Converter={StaticResource BoolToVisibility}}"/>
+
+                        <Polyline Points="{Binding LinearPoints}"
+                                  Stroke="Blue"
+                                  StrokeThickness="2"
+                                  Visibility="{Binding ShowLinear, Converter={StaticResource BoolToVisibility}}"/>
+
+                        <Polyline Points="{Binding HermitePoints}"
+                                  Stroke="Red"
+                                  StrokeThickness="2"
+                                  Visibility="{Binding ShowHermite, Converter={StaticResource BoolToVisibility}}"/>
+
+                        <ItemsControl ItemsSource="{Binding SupportMarkers}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Ellipse Width="8"
+                                             Height="8"
+                                             Fill="Black"
+                                             Canvas.Left="{Binding X}"
+                                             Canvas.Top="{Binding Y}"
+                                             Visibility="{Binding DataContext.ShowSupport, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource BoolToVisibility}}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                    </Canvas>
+
+                </Border>
+
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,10,0,20">
+
+                    <TextBlock Text="● Еталонна функція"
+                               Margin="10,0"/>
+
+                    <TextBlock Text="● Опорні точки"
+                               Margin="10,0"/>
+
+                    <TextBlock Text="● Лінійна"
+                               Margin="10,0"/>
+
+                    <TextBlock Text="● Ерміта"
+                               Margin="10,0"/>
+
+                </StackPanel>
+
+                <TextBlock Text="Графік абсолютної похибки"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Margin="0,0,0,10"/>
+
+                <Border BorderBrush="Gray"
+                        BorderThickness="1"
+                        Width="800"
+                        Height="420"
+                        Margin="0,0,0,20">
+
+                    <Canvas Width="800"
+                            Height="420"
+                            Background="White">
+
+                        <Polyline Points="{Binding LinearErrorPoints}"
+                                  Stroke="Blue"
+                                  StrokeThickness="2"
+                                  Visibility="{Binding ShowError, Converter={StaticResource BoolToVisibility}}"/>
+
+                        <Polyline Points="{Binding HermiteErrorPoints}"
+                                  Stroke="Red"
+                                  StrokeThickness="2"
+                                  Visibility="{Binding ShowError, Converter={StaticResource BoolToVisibility}}"/>
+
+                    </Canvas>
+
+                </Border>
+
+                <StackPanel Orientation="Horizontal"
+                            Margin="0,0,0,20">
+
+                    <TextBlock Text="● Похибка лінійної"
+                               Margin="10,0"/>
+
+                    <TextBlock Text="● Похибка Ерміта"
+                               Margin="10,0"/>
+
+                </StackPanel>
+
+            </StackPanel>
+
+        </ScrollViewer>
+
+    </Grid>
+
+</Window>
